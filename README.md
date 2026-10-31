@@ -14,6 +14,14 @@ A metric appears only for sensors the device reports.
 
 ## Install
 
+With [mkr](https://github.com/mackerelio/mkr):
+
+```sh
+mkr plugin install kga/mackerel-plugin-nature-remo
+```
+
+Or download an archive from [Releases](https://github.com/kga/mackerel-plugin-nature-remo/releases), or build it with Go:
+
 ```sh
 go install github.com/kga/mackerel-plugin-nature-remo@latest
 ```
