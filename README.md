@@ -29,13 +29,13 @@ NATURE_REMO_ACCESS_TOKEN=... mackerel-plugin-nature-remo
 | Option | Default | Description |
 | --- | --- | --- |
 | `-access-token` | `$NATURE_REMO_ACCESS_TOKEN` | Nature API access token |
-| `-metric-key-prefix` | `NatureRemo` | Metric key prefix |
+| `-metric-key-prefix` | `NatureRemo` | Metric key prefix: dot-separated `a-z`, `A-Z`, `0-9`, `-` and `_` |
 | `-device-key` | `name` | What identifies a device in metric names: `name` or `id` |
 | `-tempfile` | | Temp file name |
 
 ### Device names
 
-Characters other than `a-z`, `A-Z`, `0-9`, `-` and `_` in a device name become `_`, one for each character. Names such as `寝室` and `居間` therefore both become `__`. When two devices collide, the plugin keeps the first one and warns on stderr about the other. Use `-device-key=id` to avoid this; the metric names change, so existing graphs start over.
+Characters other than `a-z`, `A-Z`, `0-9`, `-` and `_` in a device name become `_`, one for each character. Names such as `寝室` and `居間` therefore both become `__`. When two devices collide, the plugin keeps the one with the smallest device ID and warns on stderr about the other. Use `-device-key=id` to avoid this; the metric names change, so existing graphs start over.
 
 ## mackerel-agent.conf
 

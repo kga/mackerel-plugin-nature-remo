@@ -27,6 +27,10 @@ func main() {
 		exit(fmt.Sprintf("invalid -device-key %q: must be %q or %q", *deviceKey, deviceKeyName, deviceKeyID))
 	}
 
+	if err := validatePrefix(*prefix); err != nil {
+		exit(err.Error())
+	}
+
 	p := mp.NewMackerelPlugin(&plugin{
 		devices:   natureremo.NewClient(*token).DeviceService,
 		prefix:    *prefix,

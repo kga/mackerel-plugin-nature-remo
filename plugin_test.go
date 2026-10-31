@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -92,23 +93,28 @@ func TestFetchMetricsNameCollision(t *testing.T) {
 		device("id-2", "居間", map[natureremo.SensorType]float64{natureremo.SensorTypeTemperature: 22}),
 	}
 
-	var warnings []string
-	p := &plugin{
-		devices:   fakeDevices{devices: devices},
-		deviceKey: deviceKeyName,
-		warnf: func(format string, args ...any) {
-			warnings = append(warnings, fmt.Sprintf(format, args...))
-		},
-	}
-	got, err := p.FetchMetrics()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if want := map[string]float64{"temperature.__": 18}; !maps.Equal(got, want) {
-		t.Errorf("got %v, want %v", got, want)
-	}
-	if len(warnings) != 1 || !strings.Contains(warnings[0], "居間") {
-		t.Errorf("warnings = %q, want one naming the skipped device", warnings)
+	reversed := slices.Clone(devices)
+	slices.Reverse(reversed)
+
+	for _, input := range [][]*natureremo.Device{devices, reversed} {
+		var warnings []string
+		p := &plugin{
+			devices:   fakeDevices{devices: input},
+			deviceKey: deviceKeyName,
+			warnf: func(format string, args ...any) {
+				warnings = append(warnings, fmt.Sprintf(format, args...))
+			},
+		}
+		got, err := p.FetchMetrics()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if want := map[string]float64{"temperature.__": 18}; !maps.Equal(got, want) {
+			t.Errorf("got %v, want %v", got, want)
+		}
+		if len(warnings) != 1 || !strings.Contains(warnings[0], "居間") {
+			t.Errorf("warnings = %q, want one naming the skipped device", warnings)
+		}
 	}
 }
 
@@ -117,6 +123,22 @@ func TestFetchMetricsError(t *testing.T) {
 	p := &plugin{devices: fakeDevices{err: want}}
 	if _, err := p.FetchMetrics(); !errors.Is(err, want) {
 		t.Errorf("err = %v, want %v", err, want)
+	}
+}
+
+func TestValidatePrefix(t *testing.T) {
+	valid := []string{"NatureRemo", "custom.home", "a-b_c.d1"}
+	for _, prefix := range valid {
+		if err := validatePrefix(prefix); err != nil {
+			t.Errorf("validatePrefix(%q) = %v, want nil", prefix, err)
+		}
+	}
+
+	invalid := []string{"", "a b", "日本", "a*", "a#", ".a", "a.", "a..b", "a\n"}
+	for _, prefix := range invalid {
+		if err := validatePrefix(prefix); err == nil {
+			t.Errorf("validatePrefix(%q) = nil, want error", prefix)
+		}
 	}
 }
 
