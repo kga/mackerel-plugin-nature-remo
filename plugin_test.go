@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -159,7 +160,7 @@ func TestOutput(t *testing.T) {
 	client.BaseURL = srv.URL
 
 	p := mp.NewMackerelPlugin(&plugin{devices: client.DeviceService, prefix: "NatureRemo", deviceKey: deviceKeyName})
-	p.Tempfile = t.TempDir() + "/tempfile"
+	p.Tempfile = filepath.Join(t.TempDir(), "tempfile")
 	out := captureStdout(t, p.OutputValues)
 
 	for _, want := range []string{"NatureRemo.temperature.Remo\t21.500000\t", "NatureRemo.humidity.Remo\t40\t"} {
