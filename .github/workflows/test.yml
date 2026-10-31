@@ -15,8 +15,8 @@ jobs:
       matrix:
         go-version: [oldstable, stable]
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
         with:
           go-version: ${{ matrix.go-version }}
       - run: test -z "$(gofmt -l .)"
@@ -26,19 +26,19 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
         with:
           go-version: stable
-      - uses: golangci/golangci-lint-action@v9
+      - uses: golangci/golangci-lint-action@v9.3.0
         with:
           version: v2.15.0
 
   vulncheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.0.0
         with:
           go-version: stable
       - run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
