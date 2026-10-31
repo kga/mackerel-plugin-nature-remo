@@ -145,7 +145,7 @@ func TestOutput(t *testing.T) {
 		w.Header().Set("X-Rate-Limit-Limit", "30")
 		w.Header().Set("X-Rate-Limit-Remaining", "29")
 		w.Header().Set("X-Rate-Limit-Reset", "1700000000")
-		fmt.Fprint(w, `[{
+		_, err := fmt.Fprint(w, `[{
 			"id": "id-1",
 			"name": "Remo",
 			"newest_events": {
@@ -153,6 +153,9 @@ func TestOutput(t *testing.T) {
 				"hu": {"val": 40, "created_at": "2026-10-31T00:00:00Z"}
 			}
 		}]`)
+		if err != nil {
+			t.Error(err)
+		}
 	}))
 	defer srv.Close()
 
@@ -182,7 +185,9 @@ func captureStdout(t *testing.T, f func()) string {
 
 	f()
 
-	w.Close()
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
 	out, err := io.ReadAll(r)
 	if err != nil {
 		t.Fatal(err)
